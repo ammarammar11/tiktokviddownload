@@ -22,13 +22,13 @@ Poetry используется для управления зависимост
 **Linux / macOS:**
 
 ```bash
-curl -sSL [https://install.python-poetry.org](https://install.python-poetry.org) | python3 -
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-(Invoke-WebRequest -Uri [https://install.python-poetry.org](https://install.python-poetry.org) -UseBasicParsing).Content | py -
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
 ```
 
 *Примечание: Возможно, потребуется перезапустить терминал или добавить директорию Poetry в PATH. Следуйте
