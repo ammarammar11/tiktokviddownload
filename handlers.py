@@ -60,7 +60,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     chat_id = message.chat_id
 
     if not is_tiktok_link(url):
-        if random.randint(1, 8) == 1:
+        if random.randint(1, 50) == 1:
             await update.message.reply_text(rand_insult())
         return
 
