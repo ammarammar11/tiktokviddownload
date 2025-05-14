@@ -9,10 +9,10 @@ from api.models import TempFile, Video
 class YouTubeApiClient:
     def __init__(self):
         self.ydl_opts = {
-            'format': 'bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',  # Optimize for Telegram
-            'outtmpl': os.path.join(tempfile.gettempdir(), '%(id)s.%(ext)s'),  # Save to temp dir
-            'noplaylist': True,  # Ensure single video
-            'quiet': True,  # Suppress console output
+            'format': 'bestvideo[vcodec~="^h264$"][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'outtmpl': os.path.join(tempfile.gettempdir(), '%(id)s.%(ext)s'),
+            'noplaylist': True,
+            'quiet': True
         }
 
     def get_content(self, youtube_url: str) -> Video:
