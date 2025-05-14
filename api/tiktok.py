@@ -1,75 +1,9 @@
-import dataclasses
 import os
 import tempfile
-from typing import Optional
 
 import requests
 
-
-@dataclasses.dataclass
-class TempFile:
-    size: int
-    path: str
-
-
-@dataclasses.dataclass
-class Image:
-    url: str
-    temp: Optional[TempFile]
-
-    def __enter__(self):
-        self.temp = save_media_to_tmp(self.url, ".jpg")
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        os.remove(self.temp.path)
-
-
-@dataclasses.dataclass
-class Audio:
-    url: str
-    title: str
-    temp: Optional[TempFile]
-
-    def __enter__(self):
-        self.temp = save_media_to_tmp(self.url, ".mp3")
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        os.remove(self.temp.path)
-
-
-@dataclasses.dataclass
-class Collection:
-    images: list[Image]
-    audio: Optional[Audio]
-
-    def __enter__(self):
-        for image in self.images:
-            image.__enter__()
-
-        self.audio.__enter__()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        for image in self.images:
-            image.__exit__(exc_type, exc_val, exc_tb)
-
-        self.audio.__exit__(exc_type, exc_val, exc_tb)
-
-
-@dataclasses.dataclass
-class Video:
-    url: str
-    temp: Optional[TempFile]
-
-    def __enter__(self):
-        self.temp = save_media_to_tmp(self.url, ".mp4")
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        os.remove(self.temp.path)
-
+from api.models import Collection, Video, Image, Audio, TempFile
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
@@ -95,19 +29,19 @@ class TikTokApiClient:
         if 'images' in data:
             images = []
             for image_url in data['images']:
-                images.append(Image(image_url, None))
+                images.append(Image(image_url, save_media_to_tmp(image_url, ".jpg")))
 
             audio = None
             if 'music_info' in data:
                 title = data['music_info']['title']
                 audio_url = data['music_info']['play']
-                audio = Audio(audio_url, title, None)
+                audio = Audio(audio_url, title, save_media_to_tmp(audio_url, ".mp3"))
 
             return Collection(images, audio)
 
         elif 'play' in data:
             video_url = data['play']
-            return Video(video_url, None)
+            return Video(video_url, save_media_to_tmp(video_url, ".mp4"))
 
         raise Exception(body.get("msg", "api code error"))
 

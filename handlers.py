@@ -5,15 +5,21 @@ import telegram
 from telegram import Update, InputMediaPhoto
 from telegram.ext import ContextTypes
 
-from api import TikTokApiClient, Collection, Video
+from api import TikTokApiClient, Collection, Video, YouTubeApiClient
 from logger import logger
 
-apiClient = TikTokApiClient()
+tiktokApiClient = TikTokApiClient()
+youtubeApiClient = YouTubeApiClient()
 
 
 def is_tiktok_link(text: str) -> bool:
     tiktok_pattern = r"(https?://(www\.)?(tiktok\.com|vm\.tiktok\.com|vt\.tiktok\.com)/.+)"
     return bool(re.match(tiktok_pattern, text))
+
+
+def is_youtube_shorts_link(text: str) -> bool:
+    shorts_pattern = r"(https?://(www\.)?youtube\.com/shorts/.+|https?://youtu\.be/.+)"
+    return bool(re.match(shorts_pattern, text))
 
 
 insults = [
@@ -51,35 +57,42 @@ def rand_insult() -> str:
     return random.choice(insults)
 
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    message = update.message
-    if not message or not message.text:
-        return
-
-    url = message.text
-    chat_id = message.chat_id
-
-    if not is_tiktok_link(url):
-        if random.randint(1, 50) == 1:
-            await update.message.reply_text(rand_insult())
-        return
-
-    user = update.message.from_user
+def build_caption(user: telegram.User, url: str) -> str:
     user_id = user.id
     username = user.username or user.first_name
     user_link = f"[{username}](tg://user?id={user_id})"
 
     original = f"[оригинал]({url})"
 
+    return fr"От {user_link} \- {original}"
+
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    message = update.message
+    if not message or not message.text:
+        return
+
+    message = update.message
+    url = message.text
+    chat_id = message.chat_id
+    caption = build_caption(message.from_user, url)
+
+    if not is_tiktok_link(url) and not is_youtube_shorts_link(url):
+        if random.randint(1, 50) == 1:
+            await update.message.reply_text(rand_insult())
+        return
+
     try:
         await update.message.delete()
     except Exception as e:
         logger.error(f"Error deleting message: {e}")
 
-    logger.info(f"Found TikTok link: {url}")
-
+    content = None
     try:
-        content = apiClient.get_content(url)
+        if is_tiktok_link(url):
+            content = tiktokApiClient.get_content(url)
+        elif is_youtube_shorts_link(url):
+            content = youtubeApiClient.get_content(url)
     except Exception as e:
         logger.error(f"Error getting content: {e}")
         await context.bot.send_message(update.message.chat_id,
@@ -101,7 +114,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                     await context.bot.send_media_group(
                         chat_id=chat_id,
                         media=media_group,
-                        caption=fr"От {user_link} \- {original}",
+                        caption=caption,
                         parse_mode=telegram.constants.ParseMode.MARKDOWN_V2
                     )
                     logger.info("Images sent successfully as media group")
@@ -117,7 +130,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                             chat_id=chat_id,
                             audio=audio_file,
                             title=collection.audio.title,
-                            caption=fr"От {user_link} \- аудио {original}",
+                            caption=caption,
                             parse_mode=telegram.constants.ParseMode.MARKDOWN_V2
                         )
                         logger.info("Audio sent successfully as audio")
@@ -132,7 +145,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                         chat_id=chat_id,
                         video=video_file,
                         supports_streaming=True,
-                        caption=fr"От {user_link} \- {original}",
+                        caption=caption,
                         parse_mode=telegram.constants.ParseMode.MARKDOWN_V2
                     )
                     logger.info("Video sent successfully as media")
@@ -155,9 +168,11 @@ async def roll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             n = int(context.args[0])
             m = int(context.args[1])
             await update.message.reply_text(str(random.randint(n, m)))
-
         except ValueError:
             await update.message.reply_text(rand_insult())
+        return
+    elif len(context.args) > 2:
+        await update.message.reply_text(rand_insult())
         return
 
     await update.message.reply_text(str(random.randint(100000, 1000000 - 1)))
