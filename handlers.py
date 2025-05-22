@@ -38,7 +38,7 @@ insults = [
     "Саша",
     "Дудецкая",
     "Шоколад",
-    "Подружка дедуцкой",
+    "Подружка дудецкой",
     "Феталь",
     "Фетальный ребенок",
     "52",
@@ -49,7 +49,26 @@ insults = [
     "Макака",
     "Никто никого не рвал, это полный бред",
     "У тебя пиздец на лице © Дамблдор",
-    "🦑"
+    "🦑",
+    "1 метр",
+    "чезабретто",
+    "21 gang",
+    "джонни",
+    "асу",
+    "я пиздец умный",
+    "аазаххахаха",
+    "фрик ебаный",
+    "пасть",
+    "муравей",
+    "сральмар",
+    "👨🏿‍❤️‍👨🏿",
+    "абрамс",
+    "20 этаж",
+    "я не стилер",
+    "го в дотан",
+    "нахуй пошел",
+    "пиздец",
+    "а соси соси мне не сделаешь?",
 ]
 
 
@@ -67,6 +86,9 @@ def build_caption(user: telegram.User, url: str) -> str:
     return fr"От {user_link} \- {original}"
 
 
+DEFAULT_CHANCE = 50
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = update.message
     if not message or not message.text:
@@ -78,7 +100,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     caption = build_caption(message.from_user, url)
 
     if not is_tiktok_link(url) and not is_youtube_shorts_link(url):
-        if random.randint(1, 50) == 1:
+        chance = DEFAULT_CHANCE
+        if update.effective_user.username.lower() == "shaorapgod":
+            chance = 16
+
+        if random.randint(1, chance) == 1:
             await update.message.reply_text(rand_insult())
         return
 
