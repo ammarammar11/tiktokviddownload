@@ -5,10 +5,8 @@ import yt_dlp
 
 from api.models import TempFile, Video
 
-# 'format': 'bestvideo[vcodec~="^h264$"][ext=mp4]+bestaudio[ext=m4a]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-
 YDL_OPTS = {
-    'format': "mp4",
+    'format': 'bestvideo+bestaudio/best',
     'outtmpl': os.path.join(tempfile.gettempdir(), '%(id)s.%(ext)s'),
     'noplaylist': True,
     'quiet': True,
