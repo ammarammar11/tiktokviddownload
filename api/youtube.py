@@ -5,19 +5,19 @@ import yt_dlp
 
 from api.models import TempFile, Video
 
+YDL_OPTS = {
+    'format': 'bestvideo[vcodec~="^h264$"][ext=mp4]+bestaudio[ext=m4a]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+    'outtmpl': os.path.join(tempfile.gettempdir(), '%(id)s.%(ext)s'),
+    'noplaylist': True,
+    'quiet': True,
+    'merge_output_format': 'mp4'
+}
+
 
 class YouTubeApiClient:
-    def __init__(self):
-        self.ydl_opts = {
-            'format': 'bestvideo[vcodec~="^h264$"][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-            'outtmpl': os.path.join(tempfile.gettempdir(), '%(id)s.%(ext)s'),
-            'noplaylist': True,
-            'quiet': True
-        }
-
     def get_content(self, youtube_url: str) -> Video:
         try:
-            with yt_dlp.YoutubeDL(self.ydl_opts) as ydl:
+            with yt_dlp.YoutubeDL(YDL_OPTS) as ydl:
                 info = ydl.extract_info(youtube_url, download=True)  # Download the video
                 video_path = ydl.prepare_filename(info)  # Get the path to the downloaded file
                 file_size = os.path.getsize(video_path)
