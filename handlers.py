@@ -102,7 +102,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if not is_tiktok_link(url) and not is_youtube_shorts_link(url):
         chance = DEFAULT_CHANCE
         if update.effective_user.username.lower() == "shaorapgod":
-            chance = 16
+            chance = 5
 
         if random.randint(1, chance) == 1:
             await update.message.reply_text(rand_insult())
