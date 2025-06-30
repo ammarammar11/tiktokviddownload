@@ -22,7 +22,7 @@ def main() -> None:
     app.add_handler(CommandHandler("ch", choose))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    app.add_handler(CommandHandler("/all", handle_all))
+    app.add_handler(CommandHandler("all", handle_all))
     app.add_handler(MessageHandler(filters.Regex(r'(?i)@all'), handle_all))
 
     logger.info("Bot started")
