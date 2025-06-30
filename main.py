@@ -1,4 +1,5 @@
 import os
+import re
 
 import dotenv
 from telegram.ext import (
@@ -23,7 +24,7 @@ def main() -> None:
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     app.add_handler(CommandHandler("all", handle_all))
-    app.add_handler(MessageHandler(filters.Regex(r'(?i)@all'), handle_all))
+    app.add_handler(MessageHandler(filters.Regex(re.compile(r'@all', re.IGNORECASE)), handle_all))
 
     logger.info("Bot started")
     app.run_polling()
