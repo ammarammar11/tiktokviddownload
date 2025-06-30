@@ -1,3 +1,4 @@
+import asyncio
 import random
 import re
 
@@ -216,3 +217,12 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         update.message.chat_id,
         random.choice(context.args)
     )
+
+async def handle_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    try:
+        await update.message.pin(disable_notification=False)
+        await asyncio.sleep(10)
+        await update.message.unpin()
+    except Exception as e:
+        logger.logger.error(e)
+
