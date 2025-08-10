@@ -1,3 +1,26 @@
 .idea
 .env
 poetry.lock
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# IDE files
+.idea/
+.vscode/
+
+# Poetry lock file (optional, if you don't want to commit it)
+poetry.lock
+
+# OS files
+.DS_Store
+Thumbs.db

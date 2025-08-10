@@ -82,9 +82,9 @@ def build_caption(user: telegram.User, url: str) -> str:
     username = user.username or user.first_name
     user_link = f"[{username}](tg://user?id={user_id})"
 
-    original = f"[оригинал]({url})"
+    original = f"[click here for the video link]({url})"
 
-    return fr"От {user_link} \- {original}"
+    return fr"[here you go ]{user_link} \- {original}"
 
 
 DEFAULT_CHANCE = 50
@@ -123,7 +123,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     except Exception as e:
         logger.error(f"Error getting content: {e}")
         await context.bot.send_message(update.message.chat_id,
-                                       "Не удалось получить контент. Проверьте ссылку или попробуйте позже.")
+                                       ".Failed to retrieve content. Check the link or try again later.")
         return
 
     try:
@@ -148,7 +148,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 else:
                     logger.warning("No images to send")
                     await context.bot.send_message(update.message.chat_id,
-                                                   "Не удалось подготовить изображения для отправки.")
+                                                   "Unable to prepare images for submission.")
                     return
 
                 if collection.audio:
@@ -165,7 +165,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         elif isinstance(content, Video):
             with content as video:
                 if video.temp.size > 50 * 1024 * 1024:
-                    await context.bot.send_message(update.message.chat_id, "Видео слишком большое.")
+                    await context.bot.send_message(update.message.chat_id, "The video is too big.")
                     return
                 with open(video.temp.path, "rb") as video_file:
                     await context.bot.send_video(
@@ -179,7 +179,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     except Exception as e:
         logger.error(f"Error sending content: {e}")
-        await context.bot.send_message(update.message.chat_id, "Не удалось отправить контент. Попробуйте позже.")
+        await context.bot.send_message(update.message.chat_id, "Failed to send content. Please try again later.")
 
 
 async def roll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -225,4 +225,3 @@ async def handle_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         await update.message.unpin()
     except Exception as e:
         logger.logger.error(e)
-

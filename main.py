@@ -16,7 +16,7 @@ dotenv.load_dotenv()
 
 
 def main() -> None:
-    app = ApplicationBuilder().token(os.getenv("BOT_TOKEN")).build()
+    app = ApplicationBuilder().token(os.getenv("TOKEN")).build()
 
     app.add_handler(CommandHandler("all", handle_all))
     app.add_handler(MessageHandler(filters.Regex(re.compile(r'@all', re.IGNORECASE)), handle_all))
