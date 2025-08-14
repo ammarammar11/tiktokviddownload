@@ -71,7 +71,26 @@ insults = [
     "пиздец",
     "а соси соси мне не сделаешь?",
 ]
+# def message_handler (commands=['start'])
+#  async def check(message: types.Message):
+#      await message.reply(
+#          """Welcome to TikTok Downloader
+#  Using this bot, you can download tiktok videos without watermark.
 
+# # To start downloading, simply submit the link to the TikTok video.""") 
+async def start_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("""Welcome to TikTok content Downloader
+     Using this bot, you can download tiktok videos without watermark.
+    To start downloading, simply submit the link to the TikTok video.""")
+    
+    await context.bot.send_video(
+        chat_id=update.effective_chat.id,
+        video="https://t.me/tttrrererw/2",
+        caption="This is how you do it, enjoy!\n\n"
+                ,
+        
+    )
+        
 
 def rand_insult() -> str:
     return random.choice(insults)
