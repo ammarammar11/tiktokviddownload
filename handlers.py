@@ -5,6 +5,7 @@ import re
 import telegram
 from telegram import Update, InputMediaPhoto
 from telegram.ext import ContextTypes
+from telegram.helpers import escape_markdown
 
 from api import TikTokApiClient, Collection, Video, YouTubeApiClient
 from logger import logger
@@ -98,7 +99,7 @@ def rand_insult() -> str:
 
 def build_caption(user: telegram.User, url: str) -> str:
     user_id = user.id
-    username = user.username or user.first_name
+    username = escape_markdown(user.username) or escape_markdown(user.first_name)
     user_link = f"[{username}](tg://user?id={user_id})"
 
     original = f"[click here for the video link]({url})"
